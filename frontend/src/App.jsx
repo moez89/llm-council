@@ -9,6 +9,7 @@ function App() {
   const [currentConversationId, setCurrentConversationId] = useState(null);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Load conversations on mount
   useEffect(() => {
@@ -26,8 +27,10 @@ function App() {
     try {
       const convs = await api.listConversations();
       setConversations(convs);
+      setError(null);
     } catch (error) {
       console.error('Failed to load conversations:', error);
+      setError('Cannot reach backend at http://localhost:8001. Make sure the backend is running.');
     }
   };
 
@@ -48,8 +51,10 @@ function App() {
         ...conversations,
       ]);
       setCurrentConversationId(newConv.id);
+      setError(null);
     } catch (error) {
       console.error('Failed to create conversation:', error);
+      setError('Cannot reach backend at http://localhost:8001. Make sure the backend is running.');
     }
   };
 
@@ -183,6 +188,16 @@ function App() {
 
   return (
     <div className="app">
+      {error && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+          background: '#fee2e2', color: '#991b1b', padding: '12px 20px',
+          textAlign: 'center', fontSize: '14px', borderBottom: '1px solid #fca5a5'
+        }}>
+          {error} &nbsp;
+          <button onClick={() => setError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
+        </div>
+      )}
       <Sidebar
         conversations={conversations}
         currentConversationId={currentConversationId}
